@@ -1,0 +1,50 @@
+name: bigdata-tasks
+
+services:
+  task02:
+    profiles: ["02"]
+
+    build:
+      context: ..
+      dockerfile: data/02_hive/dockerfile
+
+    container_name: bigdata-task02
+
+    stdin_open: true
+    tty: true
+
+    volumes:
+      - hdfs-data:/home/hadoop/hadoopdata/hdfs
+      - hive-data:/var/lib/hive
+
+    ports:
+      - "127.0.0.1:8088:8088"
+
+  task03:
+    environment:
+      START_HIVESERVER2: "true"
+    profiles: ["03"]
+
+    build:
+      context: ..
+      dockerfile: data/03_hive-ql_partitioning_hive-server/Dockerfile
+
+    container_name: bigdata-task03
+
+    stdin_open: true
+    tty: true
+
+    volumes:
+      - hdfs-data:/home/hadoop/hadoopdata/hdfs
+      - hive-data:/var/lib/hive
+
+    ports:
+      - "127.0.0.1:8088:8088"
+
+
+volumes:
+  hdfs-data:
+    name: bigdata-hdfs
+
+  hive-data:
+    name: bigdata-hive
