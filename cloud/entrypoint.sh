@@ -7,6 +7,8 @@ set -euo pipefail
 : "${GCE_ZONE:?Zone fehlt}"
 : "${GCE_NETWORK:?Netzwerk fehlt}"
 : "${GCE_SUBNET:?Subnetz fehlt}"
+: "${TASK_SERVICE:?Aufgabenservice fehlt}"
+
 
 # Einstellungen mit Standardwerten.
 GCE_MACHINE_TYPE="${GCE_MACHINE_TYPE:-e2-standard-2}"
@@ -97,6 +99,53 @@ gc compute ssh "leon@$GCE_INSTANCE_NAME" \
     --zone="$GCE_ZONE" \
     --command="sudo bash -s" \
     < /controller/bootstrap.sh
+
+echo "Projektordner auf der VM vorbereiten..."
+gc compute ssh "leon@$GCE_INSTANCE_NAME" \
+    --zone="$GCE_ZONE" \
+    --command="mkdir -p /home/leon/bigdata"
+
+echo "Aufgaben und Setup auf die VM uebertragen..."
+gc compute scp --recurse \
+    /workspace/data \
+    /workspace/setup \
+    "leon@${GCE_INSTANCE_NAME}:/home/leon/bigdata/" \
+    --zone="$GCE_ZONE"
+
+echo "Aufgaben-Konfiguration auf der VM pruefen..."
+gc compute ssh "leon@$GCE_INSTANCE_NAME" \
+    --zone="$GCE_ZONE" \
+    --command="sudo docker compose -f /home/leon/bigdata/data/compose.yml config --quiet"
+
+echo "Aufgabendateien wurden uebertragen und Compose ist gueltig."
+
+echo "Image fuer $TASK_SERVICE bauen..."
+gc compute ssh "leon@$GCE_INSTANCE_NAME" \
+    --zone="$GCE_ZONE" \
+    --command="sudo env DOCKER_BUILDKIT=0 docker compose \
+        -f /home/leon/bigdata/data/compose.yml \
+        build $TASK_SERVICE"
+
+echo "Bisherige Aufgabencontainer stoppen..."
+gc compute ssh "leon@$GCE_INSTANCE_NAME" \
+    --zone="$GCE_ZONE" \
+    --command="sudo docker compose \
+        -f /home/leon/bigdata/data/compose.yml \
+        --profile '*' stop --timeout 60"
+
+echo "$TASK_SERVICE starten..."
+gc compute ssh "leon@$GCE_INSTANCE_NAME" \
+    --zone="$GCE_ZONE" \
+    --command="sudo docker compose \
+        -f /home/leon/bigdata/data/compose.yml \
+        up -d --no-build $TASK_SERVICE"
+
+echo "Status der Aufgabencontainer:"
+gc compute ssh "leon@$GCE_INSTANCE_NAME" \
+    --zone="$GCE_ZONE" \
+    --command="sudo docker compose \
+        -f /home/leon/bigdata/data/compose.yml \
+        --profile '*' ps --all"
 
 echo "VM und Docker sind bereit."
 echo "Zum Beenden: docker stop --time 120 bigdata-controller"

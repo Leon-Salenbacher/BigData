@@ -11,6 +11,16 @@ services:
 
     volumes:
       - type: bind
+        source: ./data
+        target: /workspace/data
+        read_only: true
+        
+      - type: bind
+        source: ./setup
+        target: /workspace/setup
+        read_only: true
+
+      - type: bind
         source: ${GCP_KEY_FILE}
         target: /secrets/gcp-key.json
         read_only: true
