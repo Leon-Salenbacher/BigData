@@ -1,0 +1,24 @@
+services:
+  controller:
+    build: ./cloud
+    image: bigdata-controller-image
+    container_name: bigdata-controller
+
+    env_file:
+      - .env
+
+    stop_grace_period: 120s
+
+    volumes:
+      - type: bind
+        source: ${GCP_KEY_FILE}
+        target: /secrets/gcp-key.json
+        read_only: true
+
+      - type: volume
+        source: ssh-keys
+        target: /root/.ssh
+
+volumes:
+  ssh-keys:
+    name: bigdata-ssh
