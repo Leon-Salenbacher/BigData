@@ -7,7 +7,7 @@ echo ========================================
 echo   Building BigData Environment
 echo ========================================
 
-docker build -t %IMAGE_NAME% .
+docker build -f data/02_hive/dockerfile -t %IMAGE_NAME% .
 
 if %ERRORLEVEL% NEQ 0 (
     echo Build failed.

@@ -4,9 +4,9 @@ FROM marcelmittelstaedt/hive_base:latest
 WORKDIR /app
 
 COPY --chown=hadoop:hadoop ./data /app/data
-COPY ./entrypoint.sh /app/entrypoint.sh
+COPY ./setup /app/setup
 
-RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /app/setup/entrypoint.sh
 
 # Hadoop env
 ENV HADOOP_HOME=/home/hadoop/hadoop
@@ -14,5 +14,5 @@ ENV PATH="${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}"
 
 USER root
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/app/setup/entrypoint.sh"]
 
