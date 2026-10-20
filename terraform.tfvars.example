@@ -1,0 +1,8 @@
+project_id = "deine-projekt-id"
+allowed_ip = "1.2.3.4/32" # Durch deine oeffentliche IPv4 ersetzen.
+
+# Optional:
+# name         = "bigdata-lab"
+# zone         = "europe-west3-a"
+# machine_type = "n2-highmem-4"
+# disk_size_gb = 200

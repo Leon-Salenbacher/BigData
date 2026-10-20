@@ -1,34 +1,57 @@
+version: '3.8'
+x-common: &common
+  restart: 'no'
+  stop_grace_period: 60s
+  healthcheck:
+    test: ['CMD', 'test', '-f', '/tmp/lab-ready']
+    interval: 30s
+    timeout: 5s
+    retries: 120
 services:
-  controller:
-    build: ./cloud
-    image: bigdata-controller-image
-    container_name: bigdata-controller
-
-    env_file:
-      - .env
-
-    stop_grace_period: 120s
-
+  task01:
+    <<: *common
+    build:
+      context: .
+      dockerfile: data/01-hadoop/Dockerfile
+    container_name: bigdata-task01
+    hostname: task01
     volumes:
-      - type: bind
-        source: ./data
-        target: /workspace/data
-        read_only: true
-        
-      - type: bind
-        source: ./setup
-        target: /workspace/setup
-        read_only: true
-
-      - type: bind
-        source: ${GCP_KEY_FILE}
-        target: /secrets/gcp-key.json
-        read_only: true
-
-      - type: volume
-        source: ssh-keys
-        target: /root/.ssh
-
+      - task01:/state
+      - ./cache:/datasets:ro
+    ports:
+      - '127.0.0.1:18088:8088'
+      - '127.0.0.1:19870:9870'
+      - '127.0.0.1:19864:9864'
+  task02:
+    <<: *common
+    build:
+      context: .
+      dockerfile: data/02-hive/Dockerfile
+    container_name: bigdata-task02
+    hostname: task02
+    volumes:
+      - task02:/state
+      - ./cache:/datasets:ro
+    ports:
+      - '127.0.0.1:28088:8088'
+      - '127.0.0.1:29870:9870'
+      - '127.0.0.1:29864:9864'
+  task03:
+    <<: *common
+    build:
+      context: .
+      dockerfile: data/03-hive-server/Dockerfile
+    container_name: bigdata-task03
+    hostname: task03
+    volumes:
+      - task03:/state
+      - ./cache:/datasets:ro
+    ports:
+      - '127.0.0.1:38088:8088'
+      - '127.0.0.1:39870:9870'
+      - '127.0.0.1:39864:9864'
+      - '127.0.0.1:31000:10000'
 volumes:
-  ssh-keys:
-    name: bigdata-ssh
+  task01:
+  task02:
+  task03:
