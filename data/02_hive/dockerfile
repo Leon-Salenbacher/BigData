@@ -4,9 +4,10 @@ FROM marcelmittelstaedt/hive_base:latest
 WORKDIR /app
 
 COPY --chown=hadoop:hadoop ./data /app/data
-COPY ./setup /app/setup
+COPY ./setup/hadoop /app/setup
 
-RUN chmod +x /app/setup/entrypoint.sh
+RUN sed -i 's/\r$//' /app/setup/*.sh \
+    && chmod +x /app/setup/entrypoint.sh
 
 # Hadoop env
 ENV HADOOP_HOME=/home/hadoop/hadoop

@@ -1,6 +1,6 @@
 services:
   controller:
-    build: ./cloud
+    build: ./setup/cloud
     image: bigdata-controller-image
     container_name: bigdata-controller
 
@@ -11,13 +11,20 @@ services:
 
     volumes:
       - type: bind
+        source: ./infra/terraform.tfvars.json
+        target: /config/terraform.tfvars.json
+        read_only: true
+        bind:
+          create_host_path: false
+
+      - type: bind
         source: ./data
         target: /workspace/data
         read_only: true
         
       - type: bind
-        source: ./setup
-        target: /workspace/setup
+        source: ./setup/hadoop
+        target: /workspace/setup/hadoop
         read_only: true
 
       - type: bind

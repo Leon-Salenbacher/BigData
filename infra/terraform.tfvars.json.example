@@ -1,0 +1,14 @@
+{
+  "project_id": "mein-gcp-projekt",
+  "region": "europe-west3",
+  "zone": "europe-west3-a",
+  "instance_name": "bigdata-vm",
+  "network_name": "default",
+  "subnet_name": "default",
+  "machine_type": "e2-standard-2",
+  "boot_disk_size_gb": 40,
+  "boot_disk_type": "pd-balanced",
+  "boot_image": "debian-cloud/debian-12",
+  "firewall_name": "bigdata-ssh-current-ip",
+  "max_run_duration_seconds": 7200
+}

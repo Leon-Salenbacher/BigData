@@ -4,7 +4,7 @@ USER root
 WORKDIR /app
 
 COPY --chown=hadoop:hadoop ./data /app/data
-COPY ./setup /app/setup
+COPY ./setup/hadoop /app/setup
 
 RUN sed -i 's/\r$//' /app/setup/*.sh \
     && chmod +x /app/setup/entrypoint.sh

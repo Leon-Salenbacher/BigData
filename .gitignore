@@ -1,1 +1,13 @@
 .env
+
+# Local Terraform inputs, state and plans (keep .terraform.lock.hcl).
+infra/.terraform/
+infra/terraform.tfvars.json
+infra/runtime.auto.tfvars.json
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+.tools/
+__pycache__/
+*.py[cod]
